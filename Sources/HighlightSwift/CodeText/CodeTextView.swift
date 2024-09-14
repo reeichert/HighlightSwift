@@ -1,6 +1,6 @@
 import SwiftUI
 
-@available(iOS 16.1, tvOS 16.1, *)
+@available(iOS 16.1, tvOS 16.1, macOS 14.0, *)
 extension CodeText: View {
     public var body: some View {
         Text(attributedText)
@@ -44,17 +44,23 @@ extension CodeText: View {
                     await highlightText(colorScheme: newColorScheme)
                 }
             }
+            .onChange(of: text, { oldValue, newValue in
+                highlightTask?.cancel()
+                highlightTask = Task {
+                    await highlightText()
+                }
+            })
     }
 }
 
 //  MARK: - Preview
 
-@available(iOS 16.1, tvOS 16.1, *)
+@available(iOS 16.1, tvOS 16.1, macOS 14.0, *)
 private struct PreviewCodeText: View {
     @State var colors: CodeTextColors = .theme(.xcode)
     @State var font: Font = .body
 
-    let code: String = """
+    @State var code: String = """
     import SwiftUI
     
     struct SwiftUIView: View {
@@ -63,9 +69,15 @@ private struct PreviewCodeText: View {
         }
     }
     """
-    
     var body: some View {
         List {
+            TextEditor(text: $code)
+                .textEditorStyle(.plain)
+                .padding(10)
+                .background {
+                    CodeTextCardView(style: .card, color: nil)
+                }
+
             CodeText(code)
                 .codeTextStyle(.card)
                 .codeTextColors(colors)
@@ -103,7 +115,7 @@ private struct PreviewCodeText: View {
     }
 }
 
-@available(iOS 16.1, tvOS 16.1, *)
+@available(iOS 16.1, tvOS 16.1, macOS 14.0, *)
 #Preview {
     PreviewCodeText()
 }

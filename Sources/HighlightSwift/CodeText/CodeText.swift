@@ -2,8 +2,8 @@ import SwiftUI
 
 @available(iOS 16.1, tvOS 16.1, *)
 public struct CodeText {
-    private let text: String
-    
+    internal let text: String
+
     internal var mode: HighlightMode = .automatic
     internal var style: CodeTextStyle = .plain
     internal var colors: CodeTextColors = .theme(.xcode)
